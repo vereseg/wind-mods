@@ -1,3 +1,11 @@
+#2/23/25 - vereseg
+
+if(!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+{
+    Write-Host "Script requires PowerShell to be ran as Admin" -ForegroundColor Red
+    exit
+}
+
 $cursorPosition = 0
 
 $itemList = @(
@@ -19,9 +27,8 @@ $itemList = foreach ($setting in $itemList){
 }
 
 function ShowMenu{
-    Clear-Host
     Write-host "      Config Menu      `n" -ForegroundColor Cyan
-    
+
     for($i = 0; $i -lt $itemList.Count; $i++)
     {
         $prefix = if($itemList[$i].action -eq "add") { "[√]" } elseif($itemList[$i].action -eq "revert") { "[X]" } else { "[ ]" }
