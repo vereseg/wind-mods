@@ -1,15 +1,19 @@
 $cursorPosition = 0
 
-$configList = @(
-    @{ name = "Old context menu"; command = "Write-Host Test context menu" },
-    @{ name = "Start search"; command = "Write-Host Test Start search" }
+$itemList = @(
+    @{ name = "Remove web results from Start Menu"; add = 'reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /T REG_DWORD /d 1'; revert = 'reg delete "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /f' },
+    @{ name = "Use old context menu by default"; add = 'reg add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve'; revert = 'reg delete "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" /f' },
+    @{ name = "Disable Windows error reporting"; add = "Disable-WindowsErrorReporting"; revert = "Enable-WindowsErrorReporting" }
 )
 
-$itemList = foreach ($setting in $configList){
+#tracks selection state
+$itemList = foreach ($setting in $itemList){
     [PSCustomObject]@{
-        name = $setting.Name
-        command = $program.command
-        selected = $false
+        name = $setting.name
+        add = $setting.add
+        revert = $setting.revert
+        #action states "none", "add", "revert"
+        action = "none"
     }
 }
 
@@ -19,7 +23,7 @@ function ShowMenu{
     
     for($i = 0; $i -lt $itemList.Count; $i++)
     {
-        $prefix = if($itemList[$i].Selected) { "[X]" } else { "[ ]" }
+        $prefix = if($itemList[$i].action -eq "add") { "[√]" } elseif($itemList[$i].action -eq "revert") { "[X]" } else { "[ ]" }
 
         if($i -eq $cursorPosition)
         {
@@ -31,7 +35,7 @@ function ShowMenu{
         }
     }
 
-    Write-Host "`nUse arrow keys to scroll, Space to select, Enter to apply, or ESC to cancel." -ForegroundColor Yellow
+    Write-Host "`nUse arrow keys to scroll, Space to select, Backspace to revert, Enter to apply, or ESC to cancel." -ForegroundColor Yellow
 }
 
 while($true)
@@ -50,7 +54,13 @@ while($true)
     }
     elseif($keyState.Key -eq [ConsoleKey]::Spacebar)
     {
-        $itemList[$cursorPosition].Selected = -not $itemList[$cursorPosition].Selected
+        if($itemList[$cursorPosition].action -eq "add") {$itemList[$cursorPosition].action = "none"}
+        else{($itemList[$cursorPosition].action = "add")}
+    }
+    elseif($keyState.Key -eq [ConsoleKey]::Backspace)
+    {
+        if($itemList[$cursorPosition].action -eq "revert") {$itemList[$cursorPosition].action = "none"}
+        else{$itemList[$cursorPosition].action = "revert"}
     }
     elseif($keyState.Key -eq [ConsoleKey]::Enter)
     {
@@ -58,20 +68,38 @@ while($true)
     }
     elseif($keyState.Key -eq [ConsoleKey]::Escape)
     {
-        Write-Host "`nExiting without changes" -ForegroundColor Yellow
+        Write-Host "`nExiting without changes." -ForegroundColor Yellow
         exit
     }
 }
 
-$selectedItems = $itemList | Where-Object { $_.Selected }
-if($selectedItems.Count -eq 0)
+$configAdd = $itemList | Where-Object { $_.action -eq "add" }
+$configRevert = $itemList | Where-Object { $_.action -eq "revert" }
+
+if(($configAdd.Count -eq 0) -and ($configRevert.Count -eq 0))
 {
-    Write-Host "`nExiting without changes" -ForegroundColor Yellow
+    Write-Host "`nExiting without changes." -ForegroundColor Yellow
+    exit
 }
 
-Write-Host "`nApplying selected changes" -ForegroundColor Green
-foreach ($itemList in $selectedItems)
+#add config
+if($configAdd.Count -gt 0)
 {
-    $itemList.command
-    Write-Host "Applied $($itemList.name)." -ForegroundColor Green
+    Write-Host "`nApplying selected changes" -ForegroundColor Yellow
+    foreach($itemList in $configAdd)
+    {
+        $itemList.add
+        Write-Host "`n$($itemList.name) - Applied." -ForegroundColor Green  
+    }
+}
+
+#revert config
+if($configRevert.Count -gt 0)
+{
+    Write-Host "`nReverting selected changes" -ForegroundColor Yellow
+    foreach($itemList in $configRevert)
+    {
+        $itemList.revert
+        Write-Host "`n$($itemList.name) - Reverted." -ForegroundColor Red  
+    }
 }
