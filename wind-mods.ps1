@@ -127,33 +127,33 @@ while ($true) {
         exit
     }
 
-
-    if ($keyState.Key -eq [ConsoleKey]::UpArrow) {
-        if(($menu[$cursorPosition - 1].type -eq "empty") -and ($cursorPosition - 2 -gt 1)){$cursorPosition -= 2}
-        elseif($cursorPosition -gt 1){$cursorPosition--}
-        else{}
-    }
-    elseif ($keyState.Key -eq [ConsoleKey]::DownArrow) {
-        if(($menu[$cursorPosition + 1].type -eq "empty") -and ($cursorPosition + 2 -lt $menu.Count - 1)){$cursorPosition += 2}
-        elseif($cursorPosition -lt $menu.Count -1){$cursorPosition++}
-        else{}
-    }
-    elseif ($keyState.Key -eq [ConsoleKey]::Spacebar) {
-        if ($menu[$cursorPosition].state -eq "add") { $menu[$cursorPosition].state = "none" }
-        else { ($menu[$cursorPosition].state = "add") }
-    }
-    elseif ($keyState.Key -eq [ConsoleKey]::Backspace) {
-        if ($menu[$cursorPosition].state -eq "remove") { $menu[$cursorPosition].state = "none" }
-        else { $menu[$cursorPosition].state = "remove" }
-    }
-    elseif ($keyState.Key -eq [ConsoleKey]::Enter) {
-        break
-    }
-    elseif ($keyState.Key -eq [ConsoleKey]::Escape) {
-        Write-Host "`nExiting without changes." -ForegroundColor Yellow
-        exit
-    }
-}
+    switch($keyState.Key){
+        'UpArrow'{
+            if(($menu[$cursorPosition - 1].type -eq "empty") -and ($cursorPosition - 2 -gt 1)){$cursorPosition -= 2}
+            elseif($cursorPosition -gt 1){$cursorPosition--}
+            else{}
+        }
+        'DownArrow'{
+            if(($menu[$cursorPosition + 1].type -eq "empty") -and ($cursorPosition + 2 -lt $menu.Count - 1)){$cursorPosition += 2}
+            elseif($cursorPosition -lt $menu.Count -1){$cursorPosition++}
+            else{}
+        }
+        'Spacebar'{
+            if ($menu[$cursorPosition].state -eq "add") { $menu[$cursorPosition].state = "none" }
+            else { ($menu[$cursorPosition].state = "add") }
+        }
+        'Backspace'{
+            if ($menu[$cursorPosition].state -eq "remove") { $menu[$cursorPosition].state = "none" }
+            else { $menu[$cursorPosition].state = "remove" }
+        }
+        'Enter'{
+            break
+        }
+        'Escape'{
+            Write-Host "`nExiting without changes." -ForegroundColor Yellow
+            exit
+        }
+    }}
 
 $selectedAdd = $menu | Where-Object { $_.state -eq "add" }
 $selectedRemove = $menu | Where-Object { $_.state -eq "remove" }
