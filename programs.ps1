@@ -4,6 +4,7 @@ winget install -e --id Giorgiotani.Peazip -i
 
 #extra programs
 winget install -e --id Microsoft.PowerToys -i
+winget install -e --id OBSProject.OBSStudio -i
 
 #sysinternals programs
 winget install -e --id Microsoft.Sysinternals.TCPView
