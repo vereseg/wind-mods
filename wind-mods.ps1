@@ -7,7 +7,6 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 
 #states "none","add","remove"
 #types "empty","setting","program"
-$recommendedRemove = @{ name = "Remove cross device programs (unreversable)" }
 $settings =@(
     [PSCustomObject]@{
         name = "Remove web results from Start Menu"
@@ -31,7 +30,7 @@ $settings =@(
         type = "setting"
     }
     [PSCustomObject]@{
-        name = "Remove cross device programs (unreversable)"
+        name = "Remove cross device programs"
         add = {Get-AppxPackage MicrosoftWindows.CrossDevice | Remove-AppxPackage; Get-AppxPackage Microsoft.YourPhone | Remove-AppxPackage}
         remove = {Write-Host unavailable -ForegroundColor Red}
         state = "none"
@@ -41,7 +40,125 @@ $settings =@(
 
 $programs =@(
     [PSCustomObject]@{
-        name = ""
+        name = "Chrome"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Firefox"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Brave"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "VLC Media Player"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Peazip"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "PowerToys"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "OBS Studio"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+)
+
+$programsSysadmin =@(
+    [PSCustomObject]@{
+        name = "Process Explorer"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Process Monitor"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Autoruns"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "TCPView"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+)
+
+$programsDev =@(
+    [PSCustomObject]@{
+        name = "Git"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "VSCode"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Notepad++"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Visual Studio Community"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "NodeJS"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "pnpm"
         add = {}
         remove = {}
         state = "none"
@@ -51,11 +168,19 @@ $programs =@(
 
 $sections = @(
     [PSCustomObject]@{
-        name = "--------------------Settings-------------------`n"
+        name = "--------------------Settings--------------------"
         type = "empty"
     }
     [PSCustomObject]@{
-        name = "`n--------------------Programs--------------------`n"
+        name = "----------------------Apps----------------------"
+        type = "empty"
+    }
+    [PSCustomObject]@{
+        name = "--------------------DevTools--------------------"
+        type = "empty"
+    }
+    [PSCustomObject]@{
+        name = "---------------------System---------------------"
         type = "empty"
     }
 )
@@ -65,14 +190,17 @@ $menu += $sections[0]
 $menu += $settings
 $menu += $sections[1]
 $menu += $programs
+$menu += $sections[2]
+$menu += $programsDev
+$menu += $sections[3]
+$menu += $programsSysadmin
 
 $cursorPosition = 1
 
 function ShowMenu {
     Clear-Host
     Write-Host "`n  ARROWS: move | ENTER: apply | ESC: cancel" -ForegroundColor Yellow
-    Write-Host "      SPACE: add | Backspace: remove" -ForegroundColor Yellow
-    Write-Host "       'A': all | 'R': recommended" -ForegroundColor Yellow
+    Write-Host "  SPACE: add | Backspace: remove | 'A': all" -ForegroundColor Yellow
     
     for ($i = 0; $i -lt $menu.Count; $i++) {
         $items = $menu[$i]
@@ -98,7 +226,7 @@ function ShowMenu {
         }
     }
 
-    Write-Host "`n------------------------------------------------" -ForegroundColor Cyan
+    Write-Host "------------------------------------------------" -ForegroundColor Cyan
     Write-Host "       [√]: addition | [X]: removal" -ForegroundColor Yellow
 }
 
@@ -131,15 +259,6 @@ while ($true) {
                 if($menu[$i].type -ne "empty"){
                     $menu[$i].state = "add"
                 }
-            }
-        }
-        'R'{
-            for($i = 0; $i -lt $menu.Count; $i++)
-            {
-                if(($menu[$i].type -ne "empty") -and ($menu[$i].name -ne $recommendedRemove)){
-                    $menu[$i].state = "add"
-                }
-                $menu[4].state = "none"
             }
         }
         'Spacebar'{
