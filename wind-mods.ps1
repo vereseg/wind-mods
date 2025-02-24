@@ -64,11 +64,11 @@ $programs =@(
 
 $sections = @(
     [PSCustomObject]@{
-        name = "--------------------Settings-------------------"
+        name = "--------------------Settings-------------------`n"
         type = "empty"
     }
     [PSCustomObject]@{
-        name = "--------------------Programs--------------------"
+        name = "`n--------------------Programs--------------------`n"
         type = "empty"
     }
 )
@@ -83,7 +83,7 @@ $cursorPosition = 1
 
 function ShowMenu {
     Clear-Host
-    Write-Host "  ARROWS: move | ENTER: apply | ESC: cancel" -ForegroundColor Yellow
+    Write-Host "`n  ARROWS: move | ENTER: apply | ESC: cancel" -ForegroundColor Yellow
     Write-Host "      SPACE: add | Backspace: remove" -ForegroundColor Yellow
     Write-Host "       'A': all | 'R': recommended" -ForegroundColor Yellow
     
@@ -111,7 +111,7 @@ function ShowMenu {
         }
     }
 
-    Write-Host "------------------------------------------------" -ForegroundColor Cyan
+    Write-Host "`n------------------------------------------------" -ForegroundColor Cyan
     Write-Host "       [√]: addition | [X]: removal" -ForegroundColor Yellow
 }
 
@@ -137,6 +137,23 @@ while ($true) {
             if(($menu[$cursorPosition + 1].type -eq "empty") -and ($cursorPosition + 2 -lt $menu.Count - 1)){$cursorPosition += 2}
             elseif($cursorPosition -lt $menu.Count -1){$cursorPosition++}
             else{}
+        }
+        'A'{
+            for($i = 0; $i -lt $menu.Count; $i++)
+            {
+                if($menu[$i].type -ne "empty"){
+                    $menu[$i].state = "add"
+                }
+            }
+        }
+        'R'{
+            for($i = 0; $i -lt $menu.Count; $i++)
+            {
+                if($menu[$i].type -ne "empty"){
+                    $menu[$i].state = "add"
+                }
+                $menu[4].state = "none"
+            }
         }
         'Spacebar'{
             if ($menu[$cursorPosition].state -eq "add") { $menu[$cursorPosition].state = "none" }
