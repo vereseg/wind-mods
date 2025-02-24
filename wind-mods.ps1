@@ -7,6 +7,7 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 
 #states "none","add","remove"
 #types "empty","setting","program"
+$recommendedRemove = @{ name = "Remove cross device programs (unreversable)" }
 $settings =@(
     [PSCustomObject]@{
         name = "Remove web results from Start Menu"
@@ -40,23 +41,9 @@ $settings =@(
 
 $programs =@(
     [PSCustomObject]@{
-        name = "VLC Media Player"
-        add = {winget install -e --id VideoLAN.VLC -i}
-        remove = {winget uninstall -e --id VideoLAN.VLC}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "Peazip"
-        add = {winget install -e --id Giorgiotani.Peazip -i}
-        remove = {winget uninstall -e --id Giorgiotani.Peazip}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "OBS Studio"
-        add = {winget install -e --id OBSProject.OBSStudio -i}
-        remove = {winget uninstall -e --id OBSProject.OBSStudio}
+        name = ""
+        add = {}
+        remove = {}
         state = "none"
         type = "program"
     }
@@ -149,7 +136,7 @@ while ($true) {
         'R'{
             for($i = 0; $i -lt $menu.Count; $i++)
             {
-                if($menu[$i].type -ne "empty"){
+                if(($menu[$i].type -ne "empty") -and ($menu[$i].name -ne $recommendedRemove)){
                     $menu[$i].state = "add"
                 }
                 $menu[4].state = "none"
