@@ -30,7 +30,7 @@ $settings =@(
         type = "setting"
     }
     [PSCustomObject]@{
-        name = "Remove cross device programs"
+        name = "Remove cross device programs (UNREVERTABLE)"
         add = {Get-AppxPackage MicrosoftWindows.CrossDevice | Remove-AppxPackage; Get-AppxPackage Microsoft.YourPhone | Remove-AppxPackage}
         remove = {Write-Host unavailable -ForegroundColor Red}
         state = "none"
@@ -90,37 +90,6 @@ $programs =@(
     }
 )
 
-$programsSysadmin =@(
-    [PSCustomObject]@{
-        name = "Process Explorer"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "Process Monitor"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "Autoruns"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "TCPView"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
-)
-
 $programsDev =@(
     [PSCustomObject]@{
         name = "Git"
@@ -166,7 +135,42 @@ $programsDev =@(
     }
 )
 
+$programsSysadmin =@(
+    [PSCustomObject]@{
+        name = "Process Explorer"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Process Monitor"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "Autoruns"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+    [PSCustomObject]@{
+        name = "TCPView"
+        add = {}
+        remove = {}
+        state = "none"
+        type = "program"
+    }
+)
+
 $sections = @(
+    [PSCustomObject]@{
+        name = "------------------------------------------------"
+        type = "empty"
+    }
     [PSCustomObject]@{
         name = "--------------------Settings--------------------"
         type = "empty"
@@ -185,56 +189,91 @@ $sections = @(
     }
 )
 
+#add all items to menu for displaying
 $menu = @()
-$menu += $sections[0]
-$menu += $settings
 $menu += $sections[1]
-$menu += $programs
+$menu += $settings
 $menu += $sections[2]
-$menu += $programsDev
+$menu += $programs
 $menu += $sections[3]
+$menu += $programsDev
+$menu += $sections[4]
 $menu += $programsSysadmin
+$menu += $sections[0] #0 is ending section
 
 $cursorPosition = 1
 
 function ShowMenu {
     Clear-Host
-    Write-Host "`n  ARROWS: move | ENTER: apply | ESC: cancel" -ForegroundColor Yellow
-    Write-Host "  SPACE: add | Backspace: remove | 'A': all" -ForegroundColor Yellow
-    
-    for ($i = 0; $i -lt $menu.Count; $i++) {
+    $header = @("`n   ARROWS: move | ENTER: apply | ESC: cancel    ",
+    "   SPACE: add | Backspace: remove | 'A': all    ",
+    ""
+    )
+    $footer = @("","       [√]: addition | [X]: removal")
+
+    #find window height and calculate viewable lines
+    $windowHeight = [Console]::WindowHeight
+    $instructionLines = $header.Count + $footer.Count
+    $viewportLimit = $windowHeight - $instructionLines #size of viewport without instructions
+
+    #handle viewport start and end position
+    if($viewportLimit -gt 4)
+    {
+        if($cursorPosition -lt $viewportLimit) {$startIndex = 0}
+        else{$startIndex = $cursorPosition - $header.Count}
+        $endIndex = [Math]::Min($startIndex + $viewportLimit, $menu.Count)
+    }
+    else #handle tiny window
+    {
+        $viewportLimit = 0
+        $startIndex = 0
+        $endIndex = 0
+    }
+
+    #draw header
+    for($i = 0; $i -lt $header.Count; $i++)
+    {
+        Write-Host $header[$i] -ForegroundColor Magenta
+    }
+
+    for ($i = $startIndex; $i -lt $endIndex; $i++) {
         $items = $menu[$i]
-        if($menu[$i].Type -eq "empty")
+        if($items.Type -eq "empty")
         {
+            #creates section titles
             Write-Host "$($items.name)" -ForegroundColor Cyan
         }
         else
         {
-            $prefix = if($items.state -eq "add"){ "[√]" }
-            elseif($items.state -eq "remove"){ "[X]" }
-            else{ "[ ]" }
+            #active selection indicators
+            $prefix = if($items.state -eq "add"){ "[√]|[ ]" }
+            elseif($items.state -eq "remove"){ "[ ]|[X]" }
+            else{ "[ ]|[ ]" }
 
             if($i -eq $cursorPosition)
             {
-                Write-Host "> $prefix $($menu[$i].name)" -ForegroundColor White -BackgroundColor DarkGray
+                Write-Host "> $prefix $($menu[$i].name)" -BackgroundColor DarkGray
             }
             else
             {
                 Write-Host "  $prefix $($menu[$i].name)"
             }
-
         }
     }
 
-    Write-Host "------------------------------------------------" -ForegroundColor Cyan
-    Write-Host "       [√]: addition | [X]: removal" -ForegroundColor Yellow
+    #draw footer
+    for($i = 0; $i -lt $footer.Count; $i++)
+    {
+        Write-Host $footer[$i] -ForegroundColor Magenta
+    }
 }
 
-while ($true) {
-    ShowMenu
+$inLoop = $true
+$widthLast = [Console]::WindowWidth
+$heightLast = [Console]::WindowHeight
 
-    $keyState = [Console]::ReadKey($true)
-
+ShowMenu
+while ($inLoop) {
     #failsafe
     if(($menu[$cursorPosition].type -eq "empty") -or ($menu[$cursorPosition].Count -lt 0) -or ($menu[$cursorPosition].Count -gt $menu.Count  -1))
     {
@@ -242,41 +281,59 @@ while ($true) {
         exit
     }
 
-    switch($keyState.Key){
-        'UpArrow'{
-            if(($menu[$cursorPosition - 1].type -eq "empty") -and ($cursorPosition - 2 -gt 1)){$cursorPosition -= 2}
-            elseif($cursorPosition -gt 1){$cursorPosition--}
-            else{}
-        }
-        'DownArrow'{
-            if(($menu[$cursorPosition + 1].type -eq "empty") -and ($cursorPosition + 2 -lt $menu.Count - 1)){$cursorPosition += 2}
-            elseif($cursorPosition -lt $menu.Count -1){$cursorPosition++}
-            else{}
-        }
-        'A'{
-            for($i = 0; $i -lt $menu.Count; $i++)
-            {
-                if($menu[$i].type -ne "empty"){
-                    $menu[$i].state = "add"
+    if([Console]::KeyAvailable)
+    {
+        $keyState = [Console]::ReadKey($true)
+        switch($keyState.Key){
+            'UpArrow'{
+                if(($menu[$cursorPosition - 1].type -eq "empty") -and ($cursorPosition - 2 -gt 1)){$cursorPosition -= 2}
+                elseif($cursorPosition -gt 1){$cursorPosition--}
+                else{}
+            }
+            'DownArrow'{
+                if(($menu[$cursorPosition + 1].type -eq "empty") -and ($cursorPosition + 2 -lt $menu.Count - 1)){$cursorPosition += 2}
+                elseif($cursorPosition -lt $menu.Count - 2){$cursorPosition++} #menu minus 2 because of closing section
+                else{}
+            }
+            'A'{
+                for($i = 0; $i -lt $menu.Count; $i++)
+                {
+                    if($menu[$i].type -ne "empty"){
+                        $menu[$i].state = "add"
+                    }
                 }
             }
+            'Spacebar'{
+                if ($menu[$cursorPosition].state -eq "add") { $menu[$cursorPosition].state = "none" }
+                else { ($menu[$cursorPosition].state = "add") }
+            }
+            'Backspace'{
+                if ($menu[$cursorPosition].state -eq "remove") { $menu[$cursorPosition].state = "none" }
+                else { $menu[$cursorPosition].state = "remove" }
+            }
+            'Enter'{
+                $inLoop = $false
+            }
+            'Escape'{
+                Write-Host "`nExiting without changes." -ForegroundColor Yellow
+                exit
+            }
         }
-        'Spacebar'{
-            if ($menu[$cursorPosition].state -eq "add") { $menu[$cursorPosition].state = "none" }
-            else { ($menu[$cursorPosition].state = "add") }
+        ShowMenu
+    }
+    else
+    {
+        Start-Sleep -Milliseconds 100
+        $width = [Console]::WindowWidth
+        $height = [Console]::WindowHeight
+        if(($width -ne $widthLast) -or ($height -ne $heightLast))
+        {
+            $widthLast = $width
+            $heightLast = $height
+            ShowMenu
         }
-        'Backspace'{
-            if ($menu[$cursorPosition].state -eq "remove") { $menu[$cursorPosition].state = "none" }
-            else { $menu[$cursorPosition].state = "remove" }
-        }
-        'Enter'{
-            break
-        }
-        'Escape'{
-            Write-Host "`nExiting without changes." -ForegroundColor Yellow
-            exit
-        }
-    }}
+    }
+}
 
 $selectedAdd = $menu | Where-Object { $_.state -eq "add" }
 $selectedRemove = $menu | Where-Object { $_.state -eq "remove" }
