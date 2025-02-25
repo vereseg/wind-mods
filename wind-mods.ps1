@@ -29,13 +29,13 @@ $settings =@(
         state = "none"
         type = "setting"
     }
-    [PSCustomObject]@{
-        name = "Remove cross device programs (UNREVERTABLE)"
-        add = {Get-AppxPackage MicrosoftWindows.CrossDevice | Remove-AppxPackage; Get-AppxPackage Microsoft.YourPhone | Remove-AppxPackage}
-        remove = {Write-Host unavailable -ForegroundColor Red}
-        state = "none"
-        type = "setting"
-    }
+    # [PSCustomObject]@{
+    #     name = "Remove cross device programs (UNREVERTABLE)"
+    #     add = {Get-AppxPackage MicrosoftWindows.CrossDevice | Remove-AppxPackage; Get-AppxPackage Microsoft.YourPhone | Remove-AppxPackage}
+    #     remove = {Write-Host unavailable -ForegroundColor Red}
+    #     state = "none"
+    #     type = "setting"
+    # }
 )
 
 $programs =@(
@@ -53,13 +53,13 @@ $programs =@(
         state = "none"
         type = "program"
     }
-    [PSCustomObject]@{
-        name = "Brave"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
+    # [PSCustomObject]@{
+    #     name = "Brave"
+    #     add = {}
+    #     remove = {}
+    #     state = "none"
+    #     type = "program"
+    # }
     [PSCustomObject]@{
         name = "VLC Media Player"
         add = {}
@@ -67,13 +67,13 @@ $programs =@(
         state = "none"
         type = "program"
     }
-    [PSCustomObject]@{
-        name = "Peazip"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
+    # [PSCustomObject]@{
+    #     name = "Peazip"
+    #     add = {}
+    #     remove = {}
+    #     state = "none"
+    #     type = "program"
+    # }
     [PSCustomObject]@{
         name = "PowerToys"
         add = {}
@@ -119,20 +119,20 @@ $programsDev =@(
         state = "none"
         type = "program"
     }
-    [PSCustomObject]@{
-        name = "NodeJS"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "pnpm"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
+    # [PSCustomObject]@{
+    #     name = "NodeJS"
+    #     add = {}
+    #     remove = {}
+    #     state = "none"
+    #     type = "program"
+    # }
+    # [PSCustomObject]@{
+    #     name = "pnpm"
+    #     add = {}
+    #     remove = {}
+    #     state = "none"
+    #     type = "program"
+    # }
 )
 
 $programsSysadmin =@(
@@ -143,27 +143,27 @@ $programsSysadmin =@(
         state = "none"
         type = "program"
     }
-    [PSCustomObject]@{
-        name = "Process Monitor"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "Autoruns"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
-    [PSCustomObject]@{
-        name = "TCPView"
-        add = {}
-        remove = {}
-        state = "none"
-        type = "program"
-    }
+    # [PSCustomObject]@{
+    #     name = "Process Monitor"
+    #     add = {}
+    #     remove = {}
+    #     state = "none"
+    #     type = "program"
+    # }
+    # [PSCustomObject]@{
+    #     name = "Autoruns"
+    #     add = {}
+    #     remove = {}
+    #     state = "none"
+    #     type = "program"
+    # }
+    # [PSCustomObject]@{
+    #     name = "TCPView"
+    #     add = {}
+    #     remove = {}
+    #     state = "none"
+    #     type = "program"
+    # }
 )
 
 $sections = @(
