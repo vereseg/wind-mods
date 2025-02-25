@@ -1,4 +1,4 @@
-#2/23/25 - vereseg
+#2/25/25 - vereseg
 
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "Script requires PowerShell to be ran as Admin" -ForegroundColor Red
@@ -29,62 +29,48 @@ $settings =@(
         state = "none"
         type = "setting"
     }
-    # [PSCustomObject]@{
-    #     name = "Remove cross device programs (UNREVERTABLE)"
-    #     add = {Get-AppxPackage MicrosoftWindows.CrossDevice | Remove-AppxPackage; Get-AppxPackage Microsoft.YourPhone | Remove-AppxPackage}
-    #     remove = {Write-Host unavailable -ForegroundColor Red}
-    #     state = "none"
-    #     type = "setting"
-    # }
 )
 
 $programs =@(
     [PSCustomObject]@{
         name = "Chrome"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Google.Chrome}
+        remove = {winget uninstall -e --id Google.Chrome}
         state = "none"
         type = "program"
     }
     [PSCustomObject]@{
         name = "Firefox"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Mozilla.Firefox}
+        remove = {winget uninstall -e --id Mozilla.Firefox}
         state = "none"
         type = "program"
     }
-    # [PSCustomObject]@{
-    #     name = "Brave"
-    #     add = {}
-    #     remove = {}
-    #     state = "none"
-    #     type = "program"
-    # }
+    [PSCustomObject]@{
+        name = "Brave"
+        add = {winget install -e --id Brave.Brave}
+        remove = {winget uninstall -e --id Brave.Brave}
+        state = "none"
+        type = "program"
+    }
     [PSCustomObject]@{
         name = "VLC Media Player"
-        add = {}
-        remove = {}
+        add = {winget install -e --id VideoLAN.VLC}
+        remove = {winget uninstall -e --id VideoLAN.VLC}
         state = "none"
         type = "program"
     }
-    # [PSCustomObject]@{
-    #     name = "Peazip"
-    #     add = {}
-    #     remove = {}
-    #     state = "none"
-    #     type = "program"
-    # }
     [PSCustomObject]@{
         name = "PowerToys"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Microsoft.PowerToys}
+        remove = {winget uninstall -e --id Microsoft.PowerToys}
         state = "none"
         type = "program"
     }
     [PSCustomObject]@{
         name = "OBS Studio"
-        add = {}
-        remove = {}
+        add = {winget install -e --id OBSProject.OBSStudio}
+        remove = {winget uninstall -e --id OBSProject.OBSStudio}
         state = "none"
         type = "program"
     }
@@ -93,77 +79,42 @@ $programs =@(
 $programsDev =@(
     [PSCustomObject]@{
         name = "Git"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Git.Git}
+        remove = {winget uninstall -e --id Git.Git}
         state = "none"
         type = "program"
     }
     [PSCustomObject]@{
         name = "VSCode"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Microsoft.VisualStudioCode}
+        remove = {winget uninstall -e --id Microsoft.VisualStudioCode}
         state = "none"
         type = "program"
     }
     [PSCustomObject]@{
         name = "Notepad++"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Notepad++.Notepad++}
+        remove = {winget uninstall -e --id Notepad++.Notepad++}
         state = "none"
         type = "program"
     }
     [PSCustomObject]@{
         name = "Visual Studio Community"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Microsoft.VisualStudio.2022.Community}
+        remove = {winget uninstall -e --id Microsoft.VisualStudio.2022.Community}
         state = "none"
         type = "program"
     }
-    # [PSCustomObject]@{
-    #     name = "NodeJS"
-    #     add = {}
-    #     remove = {}
-    #     state = "none"
-    #     type = "program"
-    # }
-    # [PSCustomObject]@{
-    #     name = "pnpm"
-    #     add = {}
-    #     remove = {}
-    #     state = "none"
-    #     type = "program"
-    # }
 )
 
 $programsSysadmin =@(
     [PSCustomObject]@{
         name = "Process Explorer"
-        add = {}
-        remove = {}
+        add = {winget install -e --id Microsoft.Sysinternals.ProcessExplorer}
+        remove = {winget uninstall -e --id Microsoft.Sysinternals.ProcessExplorer}
         state = "none"
         type = "program"
     }
-    # [PSCustomObject]@{
-    #     name = "Process Monitor"
-    #     add = {}
-    #     remove = {}
-    #     state = "none"
-    #     type = "program"
-    # }
-    # [PSCustomObject]@{
-    #     name = "Autoruns"
-    #     add = {}
-    #     remove = {}
-    #     state = "none"
-    #     type = "program"
-    # }
-    # [PSCustomObject]@{
-    #     name = "TCPView"
-    #     add = {}
-    #     remove = {}
-    #     state = "none"
-    #     type = "program"
-    # }
 )
 
 $sections = @(
